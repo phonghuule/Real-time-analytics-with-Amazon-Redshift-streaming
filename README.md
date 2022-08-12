@@ -1,7 +1,7 @@
 # Real-Time Analytics with Amazon Redshift Streaming Ingestion
 
 This lab is provided as part of **[AWS Innovate Data Edition](https://aws.amazon.com/events/aws-innovate/data/)**,  it has been adapted from the [blog post](https://aws.amazon.com/blogs/big-data/real-time-analytics-with-amazon-redshift-streaming-ingestion/)
-Click [here](https://github.com/phonghuule/aws-innovate-data) to explore the full list of hands-on labs.
+Click [here](https://github.com/phonghuule/aws-innovate-data-edition-2022) to explore the full list of hands-on labs.
 
 ℹ️ You will run this lab in your own AWS account and running this lab will incur some costs. Please follow directions at the end of the lab to remove resources to avoid future costs.
 
@@ -211,3 +211,11 @@ Follow the below steps to cleanup your account to prevent any aditional charges:
 * Navigate to [Amazon Kinesis Data Streams](https://us-east-1.console.aws.amazon.com/kinesis/home?region=us-east-1#/streams/list) and delete **ev_stream_data**
 * Navigate to [CloudFormation] and find the stack **Kinesis-Data-Generator-Cognito-User** and **Delete**
 
+## Survey
+Let us know what you thought of this lab and how we can improve the experience for you in the future by completing [this poll](https://amazonmr.au1.qualtrics.com/jfe/form/SV_6G1rmmzxUkIajTo?Session=HOL002). Participants who complete the surveys from AWS Innovate Online Conference will receive a gift code for USD25 in AWS credits 1, 2 & 3. AWS credits will be sent via email by September 30, 2022.
+
+Note: Only registrants of AWS Innovate Online Conference who complete the surveys will receive a gift code for USD25 in AWS credits via email.
+ 
+1. AWS Promotional Credits Terms and conditions apply: https://aws.amazon.com/awscredits/ 
+2. Limited to 1 x USD25 AWS credits per participant.
+3. Participants will be required to provide their business email addresses to receive the gift code for AWS credits.
