@@ -17,6 +17,7 @@ Click [here](https://github.com/phonghuule/aws-innovate-data-edition-2022) to ex
 * [Sending Data from Kinesis Data Generator](#sending-data-from-kinesis-data-generator)
 * [Consume Data From Kinesis Data Stream](#consume-data-from-kinesis-data-stream)
 * [Cleanup](#cleanup)
+* [Conclusion](#conclusion)
 * [Survey](#survey)
 
 ## Overview
@@ -211,6 +212,13 @@ Follow the below steps to cleanup your account to prevent any aditional charges:
 * Navigate to the [Amazon Redshift](https://us-east-1.console.aws.amazon.com/redshiftv2/). Choose **streaming-cluster**, **Action -> Delete**
 * Navigate to [Amazon Kinesis Data Streams](https://us-east-1.console.aws.amazon.com/kinesis/home?region=us-east-1#/streams/list) and delete **ev_stream_data**
 * Navigate to [CloudFormation] and find the stack **Kinesis-Data-Generator-Cognito-User** and **Delete**
+
+## Conclusion
+Throughout the lab, you've learnt how to connect to Kinesis Data Streams directly, without the latency and complexity by using Amazon Redshift Streaming
+
+[Streaming ingest and stream processing](https://docs.aws.amazon.com/wellarchitected/latest/analytics-lens/streaming-data-processing.html) is one of the scenarios in the [Well-Architected Framework Data Analytics Lens](https://docs.aws.amazon.com/wellarchitected/latest/analytics-lens/analytics-lens.html)
+
+We highly recommend you to deep dive the [Well-Architected Data Analytics Lens](https://docs.aws.amazon.com/wellarchitected/latest/analytics-lens/analytics-lens.html) to understand the pros and cons of decisions while building analytics systems and workloads on AWS.
 
 ## Survey
 Let us know what you thought of this lab and how we can improve the experience for you in the future by completing [this poll](https://amazonmr.au1.qualtrics.com/jfe/form/SV_6G1rmmzxUkIajTo?Session=HOL002). Participants who complete the surveys from AWS Innovate Online Conference will receive a gift code for USD25 in AWS credits 1, 2 & 3. AWS credits will be sent via email by September 30, 2022.
