@@ -32,8 +32,8 @@ In this post, we walk through the steps to create a Kinesis data stream, generat
 
 ## Create RedShift Cluster
 1. Navigate to the [Amazon Redshift](https://us-east-1.console.aws.amazon.com/redshiftv2/) service in the AWS Console.
-1. Click on create cluster and name the cluster ``streaming-cluster``.
-1. You could choose the **Free Trial** option.        
+1. Click on create cluster and name the cluster ```streaming-cluster```.
+1. Choose **dc2.large** as **Node type** and **1** for **Number of nodes**      
 1. Enter a password in **Admin user password** and take note of this
 1. Click on **Create Cluster**.
 
@@ -113,7 +113,7 @@ By creating this CloudFormation stack, you can create the necessary Cognito reso
 ## Sending Data from Kinesis Data Generator
 1. Choose **[Output]** tab of the CloudFormation stack you have created. You can open the setting screen of Kinesis Data Generator by clicking the URL of **"KinesisDataGeneratorUrl"** displayed.
 1. Enter the user name and password you have created in the the above step to **"Username"** and **"Password"** in the top right of the screen, and then login to it.
-1. Configure the log transfer setting actually in this step. In **"Region"**, choose **[-east-1]** ( N. Virginia region), and then choose ```ev-stream-data``` you have created earlier in **Stream/delivery stream**.
+1. Configure the log transfer setting actually in this step. In **"Region"**, choose **[us-east-1]** ( N. Virginia region), and then choose ```ev-stream-data``` you have created earlier in **Stream/delivery stream**.
 1. Enter **"5"** to **Records per second** (the number of log records generated per second). This means that 5 records are created per 1 second. As a result 300 records are generated in one minute, and then sent to Firehose.
 1. In **"Record template"** below, copy and paste the following codes into **Templete 1** field. This specifies the format for logging sent from clients. It automatically generates dummy log data using such as random numbers.
    ```
@@ -159,12 +159,12 @@ By creating this CloudFormation stack, you can create the necessary Cognito reso
 1. Create a materialized view to consume the stream data. This method will store stream records in semi-structured SUPER format. The JSON source is stored in Redshift without converting to Redshift types.
     ```
     CREATE MATERIALIZED VIEW ev_station_data AS
-        SELECT approximatearrivaltimestamp,
-        partitionkey,
-        shardid,
-        sequencenumber,
-        json_parse(from_varbyte(data, 'utf-8')) as payload    
-        FROM evdata."ev_stream_data";
+        SELECT approximate_arrival_timestamp,
+        partition_key,
+        shard_id,
+        sequence_number,
+        json_parse(kinesis_data) as payload  
+        FROM evdata."ev_stream_data" WHERE can_json_parse(kinesis_data);
     ```
 1. Refresh the materialized view
     ```
@@ -176,20 +176,22 @@ By creating this CloudFormation stack, you can create the necessary Cognito reso
     ```
 1. Now we can try another method to define schema in Redshift. The materialized view is distributed on the UUID value from the stream and is sorted by the approximatearrivaltimestamp value.
     ```
-    CREATE MATERIALIZED VIEW ev_station_data_extract DISTKEY(5) sortkey(1) AS
-    SELECT approximatearrivaltimestamp,
-    partitionkey,
-    shardid,
-    sequencenumber,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'_id')::character(36) as ID,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'clusterID')::varchar(30) as clusterID,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'connectionTime')::varchar(20) as connectionTime,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'kWhDelivered')::DECIMAL(10,2) as kWhDelivered,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'stationID')::DECIMAL(10,2) as stationID,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'spaceID')::varchar(100) as spaceID,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'timezone')::varchar(30) as timezone,
-    json_extract_path_text(from_varbyte(data, 'utf-8'),'userID')::varchar(30) as userID
-    FROM evdata."ev_stream_data";
+    CREATE MATERIALIZED VIEW ev_station_data_extract DISTKEY(6) sortkey(1) AUTO REFRESH YES AS
+    SELECT refresh_time,
+    approximate_arrival_timestamp,
+    partition_key,
+    shard_id,
+    sequence_number,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'_id',true)::character(36) as ID,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'clusterID',true)::varchar(30) as clusterID,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'connectionTime',true)::varchar(20) as connectionTime,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'kWhDelivered',true)::DECIMAL(10,2) as kWhDelivered,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'stationID',true)::DECIMAL(10,2) as stationID,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'spaceID',true)::varchar(100) as spaceID,
+    json_extract_path_text(from_varbyte(kinesis_data, 'utf-8'),'timezone',true)::varchar(30)as timezone,
+    json_extract_path_text(from_varbyte(kinesis_data,'utf-8'),'userID',true)::varchar(30) as userID
+    FROM evdata."ev_stream_data"
+    WHERE LENGTH(kinesis_data) < 65355;
     ```
 
     ```
